@@ -1,12 +1,21 @@
-# puc-data-specialist-data-engineer-2026
-PUC-Data Specialist - Data Engineer 2026
-Student: Ivan J P de Carvalho
+# PUC-Data Specialist - Data Engineer
+## Student: Ivan J P de Carvalho
+### Date: Jul-Oct 2026
 
 
-For this MVP, this project will be using the files available on 
-https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
+For this MVP, this project will be using the Brazil E-Commerce dataset available on: 
+https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
-The reason behind this is it's a well documented dataset containing e-commerce information from Amazon from 4Y ago
+Dataset credit: http://www.olist.com/
+
+
+> &#9432; **License:** 
+> 
+> CC BY-NC-SA 4.0 - https://creativecommons.org/licenses/by-nc-sa/4.0/
+>
+> The use of this dataset in this project is for Non Commercial use only.
+
+The reason behind this is it's a well documented dataset containing e-commerce information from 2016 to 2018
 
 All notebooks available in 
 
