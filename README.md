@@ -29,3 +29,19 @@ All notebooks available in
 
 
 ## Notebooks
+- /00 - Setup Catalog/00 - Setup Schema and Catalog
+- /01 - Dataset Import
+- /02 - Bronze Data Ingestion/02 - Bronze Ingestion
+- /03 - Silver Refinement/03 - Silver - DEA and Transformations
+
+## Questions to Answer
+```
+- What are the ratings that have the order delivered after the estimated time?
+- Which categories are top performers each month?
+- Does the freight value of a product influenced on ratings or order cancelations?
+- What are the top 10 cities of customers with most orders?
+- What is the ranking sales per each category?
+- 
+```
+
+
