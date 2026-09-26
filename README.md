@@ -33,6 +33,7 @@ All notebooks available in
 - /01 - Dataset Import
 - /02 - Bronze Data Ingestion/02 - Bronze Ingestion
 - /03 - Silver Refinement/03 - Silver - DEA and Transformations
+- /04 - Gold Refinement
 
 ## Questions to Answer
 ```
@@ -44,4 +45,9 @@ All notebooks available in
 - 
 ```
 
-
+## Problems found
+- When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not trustable. 
+    - See invalid data in order_reviews table below:
+    ![](invalid_data_review.png)
+    - A new solution needs to be found (tech debit)
+    - Decision: postpone the import of the order review data into silver layer to a after the tech debit is solved
