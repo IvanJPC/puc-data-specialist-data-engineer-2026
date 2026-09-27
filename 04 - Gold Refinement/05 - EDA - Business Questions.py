@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # DBTITLE 1,EDA - Business Questions
 # MAGIC %md
 # MAGIC # EDA — Business Questions
