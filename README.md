@@ -39,7 +39,7 @@ The dataset contains **~100K orders** placed between 2016 and 2018 across **4,00
 ### Notebooks
 All notebooks are available in layer's subfolder:
 
-![Data Pipeline Folders ](folders.png)
+![Data Pipeline Folders ](./images/folders.png)
 
 **__ATENTION__** : For a first run, all notebooks must be executed in order.
 
@@ -71,7 +71,7 @@ See session Problems found later in this README.
     - RAW schema stores the dataset RAW files imported from the dataset cloud (Kaggle)
     - Each Medallion layer is represented by a schema
 
-    ![schemas](schemas.png)
+    ![schemas](./images/schemas.png)
 
 - [01 - Dataset Import](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/01%20-%20Dataset%20Import/01%20-%20Volume%20Create%20and%20Data%20Import.ipynb)
     - **Goal:** Import the CSV files from Kaggle
@@ -126,12 +126,15 @@ See session Problems found later in this README.
 
 ### Proof of resources and table creation after running all ETL notebooks:
 #### Raw volumes and Bronze tables
-![Raw volumes and Bronze tables](raw_bronze.png)
+![Raw volumes and Bronze tables](./images/raw_bronze.png)
 
 #### Silver and Gold tables
 
-![Silver and Gold tables](silver_gold.png)
+![Silver and Gold tables](./images/silver_gold.png)
 
+
+#### fact_orders table lineage by databricks UC
+![fact_orders table lineage](./images/fact_orders_lineage.png)
 
 ---
 
@@ -164,13 +167,13 @@ The `05 - EDA - Business Questions` notebook answers the business questions defi
 
 ### Q1: What are the top 10 cities of customers with most orders?
 
-![Q1](Q1.png)
+![Q1](./images/Q1.png)
 
 **Insight:** São Paulo customers accounts for ~16% of all orders — more than double Rio de Janeiro. The top 3 cities contribute over 20% of total order volume. It`s also possible to observe a heavy concentration in major metropolitan areas and capitals.
 
 ### Q2: Is there any relation between ratings and delayed delivery?
 
-![Q2](Q2.png)
+![Q2](./images/Q2.png)
 
 **Insight:** Delivery delays have a major negative impact on customer satisfaction. While on-time deliveries achieve overwhelmingly positive reviews, delayed deliveries see a dramatic shift toward lower scores.
 
@@ -398,6 +401,6 @@ Throughout the project, the following key topics were researched and applied:
 - **Secrets management** - I've tryed to use Dababricks secrets but I've just discovered how to store secrets into Dababricks later. See more details in notebook `01 - Volume Create and Data Import`.
 - **order_reviews extraction** - When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not reliable. 
     - See invalid data in order_reviews table below:
-    ![](invalid_data_review.png)
+    ![Invalid Data in Review](./images/invalid_data_review.png)
     - A new solution needs to be found (tech debit)
     - Decision: postpone the import of the order review data into silver layer to a after the tech debit is solved
