@@ -1,12 +1,16 @@
-# PUC-Data Specialist - Data Engineer
-## Student: Ivan J P de Carvalho
-### Date: Jul-Oct 2026
+# PUC-RJ - Data Specialist - Data Engineer MVP
+- Student: Ivan J P de Carvalho
+- Date: Jul-Oct 2026
 
+---
 
+## Dataset
 For this MVP, this project will be using the Brazil E-Commerce dataset available on: 
 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
-Dataset credit: http://www.olist.com/
+### Dataset credit
+
+- Owner: http://www.olist.com/
 
 
 > &#9432; **License:** 
@@ -15,16 +19,44 @@ Dataset credit: http://www.olist.com/
 >
 > The use of this dataset in this project is for Non Commercial use only.
 
-The reason behind the use of this dataset:
-- It's a well documented dataset containing e-commerce information from 2016 to 2018
-- BR e-commerce dataset
-- Simple dataset
-- A few EDA available in Kaggle for comparative
+
+### Why this dataset
+
+The dataset contains **~100K orders** placed between 2016 and 2018 across **4,000+ Brazilian cities**, spanning multiple dimensions: customers, sellers, products, reviews, payments, and logistics. This richness makes it an ideal candidate for a **data warehouse project** that follows the full data engineering lifecycle.
+
+| Criterion | Rationale |
+| --- | --- |
+| **Realistic complexity** | 9 interconnected CSV files requiring joins, foreign keys, and star-schema modeling — mirrors real-world enterprise data |
+| **Rich business dimensions** | Covers geographic, temporal, product, customer, and satisfaction dimensions — enough to build a full DataMart |
+| **Well-documented** | Extensive community EDAs on Kaggle allow cross-validation of findings and data quality checks |
+| **Brazilian context** | A regional e-commerce market underrepresented in typical data engineering tutorials |
+| **Manageable scope** | Small enough to run on serverless compute, yet complex enough to demonstrate medallion architecture best practices |
+
+---
+
+## ETL Notebooks
+All notebooks are available in layer's subfolder.
+
+Each Silver and Gold notebooks contain the solution reasoning covering:
+
+- Data Quality Analisys:
+    - completeness (Completude)
+    - Consistency (Consistência)
+    - Uniqueness (Unicidade)
+    - Precision (Acurácia)
+    - Outliers
+- Data Ingestions Scripts
+    - It has been decided to use SQL only as much as possible
+- Reconciliation SQL's to verify ingestion results
 
 
-## Notebooks
-Notebooks available in subfolders:
+```
+Data extract notebook does not contain the information above.
+It has been verified, when ingestioning Gold layer, that a data quality verification was needed when ingestioning Bronze layer. 
+See session Problems found later in this README.
+```
 
+**Notebooks List:**
 - 00 - Setup Schema and Catalog
     - Create Databricks catalog and schema based on medallion architecture
 - 01 - Dataset Import
@@ -44,14 +76,37 @@ Notebooks available in subfolders:
 
 ---
 
-## Business Questions to Answer
-```
-✅ Q1 - What are the top 10 cities of customers with most orders?
-✅ Q2 - Is there any relation between ratings and delayed delivery?
-✅ Q3 - Which categories are top performers each month?
-✅ Q4 - Does the freight value of a product influenced on ratings or order cancelations?
-✅ Q5 - What is the ranking sales per each category?
-```
+## Business Context and questions
+
+### The scenario
+
+Olist is a Brazilian marketplace that connects small and medium-sized sellers to customers across the country. When a customer purchases a product on an Olist store, the seller is notified to fulfill that order. Once the customer receives the product — or the estimated delivery date is past due — the customer gets a satisfaction survey by email where they can leave a review score (1–5) and optionally write a comment about their experience.
+
+
+This project transforms raw e-commerce transactional data into a **structured analytical data product** (using Medallion architecture and star schema) that enables stakeholders to answer critical business questions:
+
+**1. Customer & Geographic Intelligence**
+- Which cities drive the most order volume and revenue?
+- Where should logistics and marketing investment be concentrated?
+
+**2. Logistics & Delivery Performance**
+- What percentage of orders are delivered on time vs. delayed?
+- How do delivery delays impact customer satisfaction (review scores)?
+
+**3. Product & Category Strategy**
+- Which product categories are the top revenue drivers?
+- Which categories perform best each month (seasonal trends)?
+- What is the full ranking of categories by sales?
+
+**4. Customer Satisfaction Drivers**
+- Does freight value influence review scores or order cancellations?
+- What patterns exist in customer review comments across score levels?
+
+**5. Operational Data Product**
+- A reusable star schema (facts + dimensions) in the Gold layer that can serve dashboards, BI tools, and ad-hoc SQL queries
+- Data quality checks (completeness, consistency, uniqueness, accuracy, outliers) applied at every layer
+- Reconciliation SQL scripts that validate ingestion integrity across Bronze → Silver → Gold
+
 
 ### EDA — Business Questions Answered
 
@@ -125,14 +180,11 @@ Top 3 categories per month were identified using a window function ranking. The 
 4. **Freight Is Not the Issue** — Shipping costs show minimal correlation with dissatisfaction or cancellations; focus on speed, not cost
 5. **Seasonal Opportunities** — Q4/Q1 gift-giving periods (Nov–Jan) drive Watches & Gifts sales; prepare inventory accordingly
 
-
----
-
-## Exploratory Data Analysis — fact_orders
+### Exploratory Data Analysis — fact_orders
 
 A comprehensive exploratory data analysis was performed on the Gold layer `fact_orders` table. All analyses are available in the dedicated [05 - EDA - fact_orders](#notebook-2595984940181311) notebook, using **PySpark DataFrames** and matplotlib visualizations.
 
-### Key Findings
+#### Key Findings
 
 **1. Order Status Distribution**
 - The vast majority of orders (~96,000+) are **delivered** successfully, demonstrating strong operational performance
@@ -192,7 +244,8 @@ All analyses were conducted using:
 
 
 ## Problems found
-- When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not reliable. 
+- Secrets management - 
+- order_reviews extraction - When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not reliable. 
     - See invalid data in order_reviews table below:
     ![](invalid_data_review.png)
     - A new solution needs to be found (tech debit)
