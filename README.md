@@ -1,12 +1,16 @@
-# PUC-Data Specialist - Data Engineer
-## Student: Ivan J P de Carvalho
-### Date: Jul-Oct 2026
+# PUC-RJ - Data Specialist - Data Engineer MVP
+- Student: Ivan J P de Carvalho
+- Date: Jul-Oct 2026
 
+---
 
+## Dataset
 For this MVP, this project will be using the Brazil E-Commerce dataset available on: 
 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
-Dataset credit: http://www.olist.com/
+### Dataset credit
+
+- Owner: http://www.olist.com/
 
 
 > &#9432; **License:** 
@@ -15,47 +19,143 @@ Dataset credit: http://www.olist.com/
 >
 > The use of this dataset in this project is for Non Commercial use only.
 
-The reason behind the use of this dataset:
-- It's a well documented dataset containing e-commerce information from 2016 to 2018
-- BR e-commerce dataset
-- Simple dataset
-- A few EDA available in Kaggle for comparative
 
+### Why this dataset
 
-## Notebooks
-Notebooks available in subfolders:
+The dataset contains **~100K orders** placed between 2016 and 2018 across **4,000+ Brazilian cities**, spanning multiple dimensions: customers, sellers, products, reviews, payments, and logistics. This richness makes it an ideal candidate for a **data warehouse project** that follows the full data engineering lifecycle.
 
-- 00 - Setup Schema and Catalog
-    - Create Databricks catalog and schema based on medallion architecture
-- 01 - Dataset Import
-    - Import of the CSV files from Kaggle
-    - Import by Kaggle API
-    - Needs API Token set before run
-- 02 - Bronze Ingestion
-    - Create of Bronze tables 
-    - Represent dataset import
-    - No business or bigger changes
-    - String and Number types only
-- 03 - Silver - DEA and Transformations
-- 04 - Gold Refinement 
-    - Create facts and dims tables - DataMart layer
-- 05 - EDA - Business Questions 
-    - Business Data Analysis
+| Criterion | Rationale |
+| --- | --- |
+| **Realistic complexity** | 9 interconnected CSV files requiring joins, foreign keys, and star-schema modeling — mirrors real-world enterprise data |
+| **Rich business dimensions** | Covers geographic, temporal, product, customer, and satisfaction dimensions — enough to build a full DataMart |
+| **Well-documented** | Extensive community EDAs on Kaggle allow cross-validation of findings and data quality checks |
+| **Brazilian context** | A regional e-commerce market underrepresented in typical data engineering tutorials |
+| **Manageable scope** | Small enough to run on serverless compute, yet complex enough to demonstrate medallion architecture best practices |
 
 ---
 
-## Business Questions to Answer
+## Data Pipeline (Pipeline de Dados)
+
+### Notebooks
+All notebooks are available in layer's subfolder:
+![Data Pipeline Folders ](folders.png)
+
+**__ATENTION__** : For a first run, all notebooks must be executed in order.
+
+Each Silver and Gold notebooks contain the solution reasoning covering:
+
+- Data Quality Analisys:
+    - completeness (Completude)
+    - Consistency (Consistência)
+    - Uniqueness (Unicidade)
+    - Precision (Acurácia)
+    - Outliers
+- Data Ingestions Scripts
+    - It has been decided to use SQL only as much as possible
+- Reconciliation SQL's to verify ingestion results
+
+
 ```
-✅ Q1 - What are the top 10 cities of customers with most orders?
-✅ Q2 - Is there any relation between ratings and delayed delivery?
-✅ Q3 - Which categories are top performers each month?
-✅ Q4 - Does the freight value of a product influenced on ratings or order cancelations?
-✅ Q5 - What is the ranking sales per each category?
+Data extract notebook does not contain the information above.
+It has been verified, when ingestioning Gold layer, that a data quality verification was needed when ingestioning Bronze layer. 
+See session Problems found later in this README.
 ```
 
-### EDA — Business Questions Answered
+#### Notebooks List: 
 
-The `05 - EDA - Business Questions` notebook answers the 5 business questions defined in this README using the Gold-layer star schema tables with **PySpark DataFrames** and matplotlib visualizations.
+*Links to github.
+- [00 - Setup Schema and Catalog](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/00%20-%20Setup%20Catalog/00%20-%20Setup%20Schema%20and%20Catalog.ipynb)
+    - **Root catalog**: _puc_data_specialist_de_2026_09_
+    - **Goal:** Creates the Databricks catalog and schemas based on medallion architecture for this MVP
+    - RAW schema stores the dataset RAW files imported from the dataset cloud (Kaggle)
+    - Each Medallion layer is represented by a schema
+    ![schemas](schemas.png)
+
+- [01 - Dataset Import](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/01%20-%20Dataset%20Import/01%20-%20Volume%20Create%20and%20Data%20Import.ipynb)
+    - **Goal:** Import the CSV files from Kaggle
+    - The CSV files will be stored into a volume in _00-raw_ schema
+    - Stores the files into a  folder named with the import date as a metadata of import date
+    - Import uses Kaggle API
+    - Needs API Token set before run. See notebook pre-requisite session
+
+- [02 - Bronze Ingestion](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/02%20-%20Bronze%20Data%20Ingestion/02%20-%20Bronze%20Ingestion.ipynb)
+    - **Goal:** Data extraction and Bronze layer creation
+    - **Schema:** _01-bronze_
+    - Creates Bronze tables and injest data from imported files stored in _00-raw_ schema volume
+    - Represents dataset imported
+    - No business or bigger changes
+    - String and Number types only
+    - Specific details in the notebook comments
+- [03 - Silver - DEA and Transformations](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/03%20-%20Silver%20Refinement/03%20-%20Silver%20-%20DEA%20and%20Transformations.ipynb)
+    - **Goal:** Silver layer creation with data quality check
+    - **Schema:** _02-silver_
+    - Creates Silver tables and injest data from Bronze layer
+    - Execute bronze data checks for data transformation decisions
+    - Data refinements
+    - Type casts 
+    - Value checks 
+    - Deduplication and nullable checks
+    - Reconciliation checks
+    - Specific details in the notebook comments
+- [04 - Gold Refinement ](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/04%20-%20Gold%20Refinement/04%20-%20Gold%20Refinement.ipynb)
+    - **Goal:** Business data creation using DW architecture, facts and dims tables 
+    - **Schema:** _03-gold_
+    - Data Warehouse layer
+    - All columns and all tables contains comments to assist on a data catalog creation
+    - Schema to be used: Star
+    - Specific details in the notebook comments
+
+- [05 - EDA - Business Questions](https://github.com/IvanJPC/puc-data-specialist-data-engineer-2026/blob/main/04%20-%20Gold%20Refinement/05%20-%20EDA%20-%20Business%20Questions.py) 
+    - **GOal:** Business Data Analysis
+    - **Schema:** _03-gold_
+
+
+
+### Proof of resources and table creation after running all ETL notebooks:
+#### Raw volumes and Bronze tables
+![Raw volumes and Bronze tables](raw_bronze.png)
+
+#### Silver and Gold tables
+
+![Silver and Gold tables](silver_gold.png)
+
+
+---
+
+## Business Context and questions (Contexto de Negócios e Perguntas)
+
+### The scenario
+
+Olist is a Brazilian marketplace that connects small and medium-sized sellers to customers across the country. When a customer purchases a product on an Olist store, the seller is notified to fulfill that order. Once the customer receives the product — or the estimated delivery date is past due — the customer gets a satisfaction survey by email where they can leave a review score (1–5) and optionally write a comment about their experience.
+
+### Business Questions
+
+**1. Customer & Geographic Intelligence**
+- Which cities drive the most order volume and revenue?
+- Where should logistics and marketing investment be concentrated?
+
+**2. Logistics & Delivery Performance**
+- What percentage of orders are delivered on time vs. delayed?
+- How do delivery delays impact customer satisfaction (review scores)?
+
+**3. Product & Category Strategy**
+- Which product categories are the top revenue drivers?
+- Which categories perform best each month (seasonal trends)?
+- What is the full ranking of categories by sales?
+
+**4. Customer Satisfaction Drivers**
+- Does freight value influence review scores or order cancellations?
+- What patterns exist in customer review comments across score levels?
+
+**5. Operational Data Product**
+- A reusable star schema (facts + dimensions) in the Gold layer that can serve dashboards, BI tools, and ad-hoc SQL queries
+- Data quality checks (completeness, consistency, uniqueness, accuracy, outliers) applied at every layer
+- Reconciliation SQL scripts that validate ingestion integrity across Bronze → Silver → Gold
+
+---
+## Data Analisys (Análise de Dados)
+
+The `05 - EDA - Business Questions` notebook answers the business questions defined in this README using the Gold-layer star schema tables with **PySpark DataFrames** and matplotlib visualizations.
 
 ### Q1: What are the top 10 cities of customers with most orders?
 
@@ -96,7 +196,7 @@ Top 3 categories per month were identified using a window function ranking. The 
 | DELIVERED | 19.95 | 110,197 |
 | CANCELED | 19.65 | 542 |
 
-**Insight:** There is a slight inverse relationship between freight costs and satisfaction — higher review scores correlate with ~R$ 1.60 lower freight charges. However, the difference is small (~8% variance), suggesting **freight is NOT a primary driver of dissatisfaction**. Canceled vs. delivered orders show almost identical freight costs, confirming freight is not a major cancellation factor.
+**Insight:** There is a slight inverse relationship between freight costs and satisfaction. However, the difference is small, suggesting **freight is NOT a primary driver of dissatisfaction**. Canceled vs. delivered orders show almost identical freight costs, confirming freight is not a major cancellation factor.
 
 ### Q5: What is the ranking sales per each category?
 
@@ -115,84 +215,35 @@ Top 3 categories per month were identified using a window function ranking. The 
 | 9 | Automotivo | 685,384 | 4,235 | 161.84 |
 | 10 | Ferramentas_jardim | 584,219 | 4,347 | 134.40 |
 
-**Insight:** The top 5 categories account for ~R$ 5.8M (~51%) of total sales. PCs (rank 18) have the highest average order value (R$ 1,146). Beauty & Health leads in both volume AND revenue, making it the flagship category.
-
-### Business Recommendations
-
-1. **Geographic Focus** — São Paulo's dominance (~27% of orders) justifies targeted marketing and logistics optimization
-2. **Delivery Is Critical** — On-time delivery is the strongest driver of customer satisfaction (73% score-5 rate); reducing the ~7% delay rate would significantly boost reviews
-3. **Category Strategy** — Invest in Beauty & Health (stable, high volume) and Watches & Gifts (seasonal, high-value)
-4. **Freight Is Not the Issue** — Shipping costs show minimal correlation with dissatisfaction or cancellations; focus on speed, not cost
-5. **Seasonal Opportunities** — Q4/Q1 gift-giving periods (Nov–Jan) drive Watches & Gifts sales; prepare inventory accordingly
+**Insight:** The top 5 categories account for R$ 5,8M of total sales. PCs (rank 18) have the highest average order value (R$ 1,146). Beauty & Health leads in both volume AND revenue, making it the flagship category.
 
 
 ---
 
-## Exploratory Data Analysis — fact_orders
+## Data Load (Carga dos Dados)
 
-A comprehensive exploratory data analysis was performed on the Gold layer `fact_orders` table. All analyses are available in the dedicated [05 - EDA - fact_orders](#notebook-2595984940181311) notebook, using **PySpark DataFrames** and matplotlib visualizations.
+This project transforms raw e-commerce transactional data into a **structured analytical data product** (using Medallion architecture and star schema) that enables stakeholders to answer critical business questions.
 
-### Key Findings
+### Notebooks 
+- 04 - Gold Refinement 
+    - Creates facts and dims tables - DW layer ingestion
+- 05 - EDA - Business Questions 
+    - Business Data Analysis
 
-**1. Order Status Distribution**
-- The vast majority of orders (~96,000+) are **delivered** successfully, demonstrating strong operational performance
-- **Canceled** orders represent the second largest category, indicating potential areas for customer retention improvement
-- Small volumes of unavailable, invoiced, and processing orders show normal operational states
-- **Business Impact**: The high delivery rate suggests reliable fulfillment, but the canceled orders warrant further investigation into cancellation reasons
-
-**2. Monthly Order Trends (2016–2018)**
-- Clear **upward growth trend** from late 2016 through 2018, with order volume and revenue tracking closely
-- Peak activity occurs in **Q4 2017 and Q1 2018**, likely driven by seasonal shopping (holidays, New Year)
-- Revenue ranges from ~100K to 1.6M+ per month at peak, showing business expansion
-- **Business Impact**: The growth trajectory indicates successful market penetration; seasonal peaks should inform inventory and staffing decisions
-
-**3. Review Score Distribution**
-- Strong **positive skew** with the majority of reviews at score **5** (highest satisfaction)
-- Low scores (1–2) represent a smaller but significant segment requiring attention
-- **Business Impact**: High customer satisfaction overall, but low-scoring orders should be analyzed for improvement opportunities (delivery issues, product quality, etc.)
-
-**4. Delivery Performance**
-- **Left panel** (scatter plot): Most orders delivered close to estimated time (near red diagonal line), but visible dispersion shows variability
-- **Right panel** (pie chart): Approximately **93% on-time delivery** rate with ~7% delayed
-- **Business Impact**: Strong delivery performance overall, but the 7% delayed segment impacts customer experience and likely correlates with lower review scores
-
-**5. Top 10 Cities by Revenue**
-- **São Paulo** dominates revenue by a significant margin (~R$ 680K), followed by Rio de Janeiro, Belo Horizonte, and Brasília
-- Revenue distribution follows typical Brazilian e-commerce patterns (concentration in major metropolitan areas)
-- **Business Impact**: Geographic concentration suggests opportunities for targeted marketing and logistics optimization in high-revenue cities
-
-**6. Delivery Delay vs. Review Score Correlation**
-- **Left panel** (grouped bars): Delayed deliveries are more prevalent among **low-scoring reviews** (1–2), while on-time deliveries dominate high scores (4–5)
-- **Right panel** (percentage view): Delay rate increases significantly for lower review scores — score 1 orders have the highest delay rate
-- **Business Impact**: Strong negative correlation between delivery delay and customer satisfaction. Reducing delays is critical for improving review scores
-
-**7. Review Comments by Score**
-- **Left panel** (grouped bars): Customers with lower review scores (1–3) are significantly more likely to write comments than those with high scores (4–5)
-- **Right panel** (percentage view): Comment rate reaches ~30–40% for score 1–2, compared to ~5–10% for score 5
-- **Business Impact**: Dissatisfied customers provide written feedback explaining their dissatisfaction, while satisfied customers often just leave a high score. This qualitative data is valuable for root cause analysis
-
-### Analysis Methodology
-
-All analyses were conducted using:
-- **PySpark DataFrame operations** (groupBy, agg, join, filter) for data transformation
-- **Gold layer tables**: [puc_data_specialist_de_2026_09.03-gold.fact_orders](#table), [dim_time](#table), [dim_customer](#table)
-- **Silver layer tables**: [puc_data_specialist_de_2026_09.02-silver.order_reviews](#table) for comment analysis
-- **Visualization**: matplotlib for chart generation with appropriate color schemes (green/red for performance indicators)
-
-### Recommendations
-
-1. **Reduce delivery delays** — the strongest driver of negative reviews and customer dissatisfaction
-2. **Analyze cancellation patterns** — investigate why orders are canceled to improve conversion
-3. **Leverage seasonal peaks** — optimize inventory and marketing campaigns around Q4/Q1
-4. **Mine low-score comments** — extract themes from written feedback on 1–2 star reviews for targeted improvements
-5. **Geographic optimization** — focus logistics and marketing investment on top revenue cities
-
+- **Gold layer tables**: 
+    - puc_data_specialist_de_2026_09.03-gold.fact_orders
+    - dim_time
+    - dim_customer
 
 ---
 
+## Design and Data Catalog (Modelagem e Catálogo de Dados)
 
-## Problems found
-- When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not reliable. 
+
+---
+## Problems Found Throughout the Project
+- Secrets management - I've tryed to use Dababricks secrets but I've just discovered how to store secrets into Dababricks later. See more details in notebook `01 - Volume Create and Data Import`.
+- order_reviews extraction - When ingesting the order_reviews into silver layer, it has been discovered, during the Data Analysis from bronze layer, that the data ingestion into bronze layer was not correct for csv olist_order_reviews_dataset.csv. The method used to create the bronze table using read_file function has messed it up the comments when they have commas and bronze layer has received many invalid records and they was not reliable. 
     - See invalid data in order_reviews table below:
     ![](invalid_data_review.png)
     - A new solution needs to be found (tech debit)
